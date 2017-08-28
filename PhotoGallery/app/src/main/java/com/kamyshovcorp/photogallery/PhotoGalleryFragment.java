@@ -1,15 +1,21 @@
 package com.kamyshovcorp.photogallery;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
+
 public class PhotoGalleryFragment extends Fragment {
+
+    public static final String TAG = "PhotoGalleryFragment";
 
     private RecyclerView mPhotoRecyclerView;
 
@@ -22,6 +28,8 @@ public class PhotoGalleryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // При изменении ориентации экрана фрагмент не будет пересоздаваться
         setRetainInstance(true);
+        // При вызове execute() запускаем метод doInBackground()
+        new FetchItemsTask().execute();
     }
 
     @Nullable
@@ -33,5 +41,18 @@ public class PhotoGalleryFragment extends Fragment {
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
 
         return v;
+    }
+
+    private class FetchItemsTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                String result = new FlickrFetchr().getUrlString("https://www.android.com");
+                Log.i(TAG, "Fetched content of URL: " + result);
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to fetch URL: ", e);
+            }
+            return null;
+        }
     }
 }
